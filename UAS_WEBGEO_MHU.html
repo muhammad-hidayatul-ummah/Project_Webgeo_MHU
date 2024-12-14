@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>SI AiR</title>
+    <link rel="icon" href= "./Logo.png" type="image/x-icon" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            position: absolute;
+            top: 75px;  /* Adjusted the top value */
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <style>
+        .map-overlay {
+            position: absolute;
+            width: 25%;
+            top: 100;
+            left: 0;
+            padding: 10px;
+        }
+
+        .map-overlay .map-overlay-inner {
+            background-color: #b3cde0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 10px;
+            height: auto;
+        }
+
+        .map-overlay h2 {
+            line-height: 24px;
+            display: block;
+            margin: 0 0 10px;
+            font-size: large;
+            font-family: Arial, Helvetica, sans-serif;
+            color: black;
+        }
+
+        .map-overlay p {
+            line-height: 24px;
+            display: block;
+            margin: 0 0 10px;
+            font-size: medium;
+            font-family: Arial, Helvetica, sans-serif;
+            color: black;
+        }
+
+        .map-overlay input {
+            background-color: transparent;
+            display: inline-block;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            cursor: ew-resize;
+        }
+
+        #features {
+            top: 55px;
+            height: 100px;
+            margin-top: 20px;
+            width: 250px;
+        }
+
+        /* Modify the background color */
+        .navbar-custom {
+            background-color: #003B6D;
+            height: 75px;  /* Adjusted the height */
+        }
+
+        /* Modify brand and text color */
+        .navbar-custom .navbar-brand,
+        .navbar-custom .navbar-text {
+            color: white;
+            display: flex;
+            align-items: center;
+            margin-left: 0px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: x-large;
+            height: 100%; 
+        }
+        .navbar-brand img {
+            margin-right: 10px;
+            margin-top: 10px;;
+        }
+        .modal-dialog { max-width: 80%;  height: 80vh; } 
+        .modal-content { height: 100%; }
+        .dark .mapboxgl-ctrl-scale {
+  color: hsl(var(--foreground)); 
+}
+
+.dark .mapboxgl-ctrl-group,
+.dark .mapboxgl-ctrl-scale {
+  background: hsl(var(--background));  
+}
+
+.dark .mapboxgl-ctrl-icon {
+  filter: invert(1);
+}
+
+.modal-dialog{
+    overflow-y: initial !important
+}
+.modal-body{
+    height: 80vh;
+    overflow-y: auto;
+}
+    </style>
+    <!-- Nav bar -->
+    <nav class="navbar navbar-custom">
+        <a class="navbar-brand" href="#" data-toggle="modal" data-target="#infoModal">
+            <img src="./Logo.png" width="60" height="75" alt="">
+            <b>SISTEM INFORMASI KEBUTUHAN AIR BERSIH PER BANGUNAN KECAMATAN TUGU KABUPATEN TRENGGALEK</b>
+        </a>
+    </nav>
+    <!-- Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Tentang Aplikasi</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img src="./Logo.png" width="60" height="75"/>
+                    <p>Sistem informasi ini menyajikan tingkat kebutuhan air bersih setiap bangunan di Kecamatan Tugu, Kabupaten Trenggalek.
+                    Data yang disajikan merupakan data dummy, sehingga tidak merepresentasikan kondisi sebenarnya, hanya sebagai pendukung
+                    pembuatan web saja. Sistem ini dibuat sebagai pemenuhan tugas take home exam mata kuliah Web Geospasial, Program Studi
+                    Magister Teknik geomatika.</p>
+
+                    <br>
+                    <p></p><b>Cara penggunaan :</b></p>
+                    <ul>
+                    <li> Atur slider untuk mengetahui bangunan mana yang memiliki kebutuhan air dengan konsumsi kurang dari nilai ambang batas.</li>
+                    <li>Arahkan kursor ke salah satu bangunan untuk mendapatkan informasi jumlah kebutuhan air di kotak sebelah kanan atas.</li>
+                    </ul>
+                    <br>
+                    <p><b>Fitur interaktif :</b></p>
+                    <br>
+                    <ul>
+                    <li>Zoom : Fitur scroll up and down mouse</li>
+                    <li>Menggeser tampilan : Klik kiri mouse, kemudian arahkan</li>
+                    <li>Mengatur sudut pandang : Klik kanan mouse, kemudian arahkan</li>
+                    </ul>
+                    <br>
+                    <p>
+                        <b>Dibuat Oleh</b> :
+                    </p>
+                    <br><p>Muhammad Hidayatul Ummah</p>
+                    <p>NIM 23/527362/PTK/15538</p>
+
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="map"></div>
+
+    <div class="map-overlay top">
+        <div class="map-overlay-inner">
+            <h2><b>Kebutuhan Air (Liter/Bulan)</b></h2>
+            <label id="Water_Need"></label>
+            <input id="slider" type="range" min="1000" max="1500" step="50" value="1000">
+        </div>
+        <div class="map-overlay-inner">
+            <div id="features" class="Features">
+                <h2><b>Kebutuhan Air Bersih Per Bulan</b></h2>
+                <div id="pd"><p>Arahkan kursor ke salah satu bangunan!</p></div>
+            </div>
+        </div>
+        <div class="map-overlay-inner">
+            <div id="chart">
+                <h2><b>Grafik Jenis Bangunan</b></h2>
+                <canvas id="waterChart" width="280" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibXVoYW1tYWRoaWRheWF0dWx1bW1haCIsImEiOiJjbTRmOGE0dHAwYWRsMmtxMndhcDN4d2xkIn0.OCDDQzmTJEqRwxqUeL5MqA';
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v11',
+            projection: 'winkelTripel',
+            center: [111.656359, -8.046554],
+            zoom: 15,
+            pitch: 60,    
+            bearing: 5
+        });
+
+        function filterBy(Water_Need) {
+            const filters = ['<=', 'Water_Need', Water_Need];
+            map.setFilter('Building-aui6ix', filters);
+            document.getElementById('Water_Need').textContent = Water_Need;
+        }
+
+        map.on('load', () => {
+            map.addSource('Building-aui6ix', {
+                'type': 'vector',
+                'url': 'mapbox://muhammadhidayatulummah.5s99vkn9'
+            });
+
+            map.addLayer({
+                'id': 'Building-aui6ix',
+                'type': 'fill-extrusion',
+                'source': 'Building-aui6ix',
+                'source-layer': 'Building-aui6ix',
+                'paint': {
+                    'fill-extrusion-height': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'Height'],
+                        3, 0,
+                        4, 0
+                    ],
+                    'fill-extrusion-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'Water_Need'],
+                        1000, '#c5cffb',
+                        1500, 'hsl(244, 86%, 30%)'
+                    ],
+                    'fill-extrusion-vertical-scale': 3,
+                    'fill-extrusion-base': 3,
+                    'fill-extrusion-flood-light-ground-attenuation': 1
+                }
+            });
+
+            filterBy(1000);  // Initial filter
+
+            document.getElementById('slider').addEventListener('input', (e) => {
+                const Water_Need = parseInt(e.target.value, 10);
+                filterBy(Water_Need);
+            });
+        });
+        map.addControl(
+        new MapboxGeocoder({
+            accessToken: 'pk.eyJ1IjoibXVoYW1tYWRoaWRheWF0dWx1bW1haCIsImEiOiJjbTRmOGE0dHAwYWRsMmtxMndhcDN4d2xkIn0.OCDDQzmTJEqRwxqUeL5MqA',
+            mapboxgl: mapboxgl
+        })
+             );
+        map.addControl(new mapboxgl.NavigationControl())
+        map.addControl(new mapboxgl.ScaleControl())
+
+        
+        map.on('mousemove', (event) => {
+            const states = map.queryRenderedFeatures(event.point, {
+                layers: ['Building-aui6ix']
+            });
+            document.getElementById('pd').innerHTML = states.length
+                ? `<p>Kebutuhan Air Bersih ${states[0].properties.Water_Need} Liter/bulan</p>`
+                : `<p>Arahkan kursor ke salah satu bangunan!</p>`;
+        });
+        const layers = [
+            'Residensial',
+            'Fasilitas Umum',
+            'Industri'
+
+        ];
+        const colors = [
+          '#c07a11',
+          '#daa462',
+          
+        ];
+        const chartData = {
+          labels: layers,
+          datasets: [{
+            label: 'Luasan',
+            data: [2000,1500,500], // Example data, replace with actual area sizes
+            backgroundColor: colors
+          }]
+        };
+
+        // create chart
+        const ctx = document.getElementById('waterChart').getContext('2d');
+        const waterChart = new Chart(ctx, {
+          type: 'pie',
+          data: chartData,
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                beginAtZero: true,
+                ticks: {
+                  maxRotation: 90,
+                  minRotation: 0
+                }
+              },
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+    </script>
+</body>
+</html>
